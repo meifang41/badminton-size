@@ -197,7 +197,7 @@ var QTY_MAX=10;
     MEMBERS.forEach(function(n,i){
       var o=document.createElement("option");o.value=String(i);
       var d=members[n];
-      o.textContent=n+(d?"　✓ "+d.size+" × "+d.qty:"");
+      o.textContent=n+(d?"　✓ 已填":"");
       who.appendChild(o);
     });
     who.value=keep;
