@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>羽球會員衣服尺寸登記</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#f2f5f0; --surface:#ffffff; --ink:#152219; --muted:#5b6b60; --line:#d6ded4;
+  --court:#1d5a41; --court-ink:#ffffff; --shuttle:#e9c64a; --warn:#b4531a; --ok:#1d5a41;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --font-num:"Barlow Condensed","Arial Narrow",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1812; --surface:#16241b; --ink:#e8efe6; --muted:#97a89c; --line:#2a3b2f;
+  --court:#5fbf8f; --court-ink:#0c1a12; --warn:#f0a064; --ok:#7fd3a6; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  padding:24px 16px 48px}
+.wrap{max-width:640px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+header h1{font-size:1.7rem;line-height:1.25;margin:0 0 4px;font-weight:700}
+header p{margin:0;color:var(--muted)}
+.court{display:flex;align-items:center;gap:14px}
+.meter{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--court);transition:width .4s}
+.count{font-family:var(--font-num);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.count small{font-size:1rem;color:var(--muted);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-weight:700;font-size:.95rem}
+select{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border:0;padding:0;margin:0;min-width:0}
+.sizes legend{padding:0;margin-bottom:8px}
+.sizes input{position:absolute;opacity:0;pointer-events:none}
+.sizes label{display:flex;align-items:center;justify-content:center;min-height:52px;border:1.5px solid var(--line);border-radius:8px;
+  font-family:var(--font-num);font-size:1.5rem;font-weight:700;cursor:pointer;background:var(--bg);user-select:none}
+.sizes input:checked+label{background:var(--court);color:var(--court-ink);border-color:var(--court)}
+.sizes input:focus-visible+label,select:focus-visible,button:focus-visible{outline:3px solid var(--shuttle);outline-offset:2px}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:13px 18px;background:var(--court);color:var(--court-ink);cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.msg{min-height:1.5em;font-size:.95rem;margin:0}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--warn)}
+h2{font-size:1.1rem;margin:0}
+.stat{display:grid;grid-template-columns:48px 1fr 32px;align-items:center;gap:10px;font-family:var(--font-num);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.stat .bar{height:14px;background:var(--line);border-radius:4px;overflow:hidden}
+.stat .bar i{display:block;height:100%;background:var(--shuttle);width:0;transition:width .4s}
+.stat b{text-align:right}
+.stats{display:flex;flex-direction:column;gap:6px}
+ul.roster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}
+.roster li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);min-width:0}
+.roster .n{overflow-wrap:anywhere}
+.roster .s{font-family:var(--font-num);font-weight:700;font-size:1.2rem;color:var(--ok)}
+.roster .s.none{font-family:var(--font-body);font-weight:400;font-size:.9rem;color:var(--warn)}
+@media (max-width:420px){ul.roster{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>2026 羽球會員<br>衣服尺寸登記</h1>
+    <p>選你的名字、選尺寸、按送出。送出後可以再回來修改。</p>
+  </header>
+
+  <div class="court" aria-live="polite">
+    <div class="count"><span id="done">0</span><small> / <span id="total">0</span> 人已填</small></div>
+    <div class="meter"><i id="meter"></i></div>
+  </div>
+
+  <form class="card" id="form">
+    <div>
+      <label class="lbl" for="who">會員姓名</label>
+      <select id="who"></select>
+    </div>
+    <fieldset class="sizes" id="sizes"><legend class="lbl">衣服尺寸</legend></fieldset>
+    <button type="submit" id="submit" disabled>送出</button>
+    <p class="msg" id="msg" role="status"></p>
+  </form>
+
+  <section class="card">
+    <h2>尺寸統計</h2>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="card">
+    <h2>填寫狀況</h2>
+    <ul class="roster" id="roster"></ul>
+  </section>
+</div>
+
+<script>
+// 把 Google Apps Script 部署後得到的網址貼在下面兩個引號中間
+var API_URL = "https://script.google.com/macros/s/AKfycbxEoOvHgoGpGYkb4_BhB0_qqZg8eWiq7bp2q56a8CEr285keM6lA0a_TsuHrLL-FbmV/exec";
+
+var MEMBERS=["劉道一","劉玫芳","賴宛詩","殷宏源","楊曉雯","謝育均","賴秀鳳","林易騰","簡廷澔","彭晨軒","黃偉政","李榮淑","陳文娟","陳培基","吳光榮","素娟","黃足寧","王耀毅","蕭靜純","許家莉","陳俊賢","黃晧維","邱聖凱","劉淑娟","亭妤","HELEN","齊老"];
+var SIZES=["XS","S","M","L","XL","2XL","3XL","4XL"];
+
+(function(){
+  var data={};            // 姓名 -> 尺寸
+  var busy=false, ready=false;
+  var $=function(id){return document.getElementById(id)};
+
+  $("total").textContent=MEMBERS.length;
+  var sizesEl=$("sizes");
+  SIZES.forEach(function(s){
+    var i=document.createElement("input");i.type="radio";i.name="size";i.id="sz-"+s;i.value=s;
+    var l=document.createElement("label");l.htmlFor=i.id;l.textContent=s;
+    sizesEl.appendChild(i);sizesEl.appendChild(l);
+  });
+  sizesEl.addEventListener("change",refreshButton);
+
+  var who=$("who");
+  function buildSelect(){
+    var keep=who.value;
+    who.innerHTML="";
+    var ph=document.createElement("option");ph.value="";ph.textContent="請選擇你的名字";who.appendChild(ph);
+    MEMBERS.forEach(function(n,i){
+      var o=document.createElement("option");o.value=String(i);
+      o.textContent=n+(data[n]?"　✓ "+data[n]:"");
+      who.appendChild(o);
+    });
+    who.value=keep;
+  }
+  who.addEventListener("change",function(){
+    var d=data[MEMBERS[+who.value]];
+    SIZES.forEach(function(s){$("sz-"+s).checked=(d===s)});
+    $("msg").textContent="";$("msg").className="msg";
+    refreshButton();
+  });
+  function selectedSize(){var c=document.querySelector('input[name="size"]:checked');return c?c.value:""}
+  function refreshButton(){
+    var b=$("submit");
+    b.disabled=!ready||busy||who.value===""||selectedSize()==="";
+    b.textContent=(who.value!==""&&data[MEMBERS[+who.value]])?"更新尺寸":"送出";
+  }
+
+  function render(){
+    var counts={};SIZES.forEach(function(s){counts[s]=0});
+    var done=0;
+    MEMBERS.forEach(function(n){var s=data[n];if(s&&counts[s]!==undefined){counts[s]++;done++}});
+    $("done").textContent=done;
+    $("meter").style.width=(MEMBERS.length?done/MEMBERS.length*100:0)+"%";
+    var max=Math.max.apply(null,SIZES.map(function(s){return counts[s]}).concat([1]));
+    $("stats").innerHTML=SIZES.map(function(s){
+      return '<div class="stat"><span>'+s+'</span><span class="bar"><i style="width:'+(counts[s]/max*100)+'%"></i></span><b>'+counts[s]+'</b></div>';
+    }).join("");
+    var ul=$("roster");ul.innerHTML="";
+    MEMBERS.forEach(function(n){
+      var s=data[n];
+      var li=document.createElement("li");
+      var a=document.createElement("span");a.className="n";a.textContent=n;
+      var b=document.createElement("span");b.className="s"+(s?"":" none");b.textContent=s||"未填";
+      li.appendChild(a);li.appendChild(b);ul.appendChild(li);
+    });
+    buildSelect();refreshButton();
+  }
+
+  function call(params){
+    var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k])}).join("&");
+    return fetch(API_URL+"?"+q).then(function(r){return r.json()});
+  }
+  function load(){
+    return call({action:"list"}).then(function(res){
+      var next={};
+      (res.data||[]).forEach(function(r){if(r.name&&r.size)next[r.name]=r.size});
+      data=next;ready=true;render();
+    });
+  }
+
+  $("form").addEventListener("submit",function(e){
+    e.preventDefault();
+    if(!ready||busy)return;
+    var name=MEMBERS[+who.value],size=selectedSize();
+    if(!name||!size)return;
+    busy=true;refreshButton();
+    var msg=$("msg");msg.className="msg";msg.textContent="送出中…";
+    call({action:"submit",name:name,size:size}).then(function(res){
+      if(!res.ok)throw new Error(res.error||"failed");
+      msg.className="msg ok";msg.textContent=name+" 的尺寸 "+size+" 已記錄。";
+      return load();
+    }).catch(function(){
+      msg.className="msg err";msg.textContent="送出失敗，請稍後再試一次。";
+    }).then(function(){busy=false;refreshButton()});
+  });
+
+  render();
+  if(!API_URL){
+    $("msg").className="msg err";
+    $("msg").textContent="尚未設定資料連結。請主辦人依說明把 Google Apps Script 網址貼到 index.html 的 API_URL。";
+    return;
+  }
+  $("msg").textContent="讀取名單中…";
+  load().then(function(){$("msg").textContent=""}).catch(function(){
+    $("msg").className="msg err";$("msg").textContent="目前連不上資料庫，請稍後重新整理。";
+  });
+})();
+</script>
+</body>
+</html>
