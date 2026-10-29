@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>羽球會員衣服尺寸登記</title>
+<title>羽球衣服尺寸登記</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -17,8 +17,7 @@
   --bg:#0e1812; --surface:#16241b; --ink:#e8efe6; --muted:#97a89c; --line:#2a3b2f;
   --court:#5fbf8f; --court-ink:#0c1a12; --warn:#f0a064; --ok:#7fd3a6; color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;
-  padding:24px 16px 48px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;padding:24px 16px 48px}
 .wrap{max-width:640px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
 header h1{font-size:1.7rem;line-height:1.25;margin:0 0 4px;font-weight:700}
 header p{margin:0;color:var(--muted)}
@@ -29,14 +28,39 @@ header p{margin:0;color:var(--muted)}
 .count small{font-size:1rem;color:var(--muted);font-weight:500}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px}
 .lbl{font-weight:700;font-size:.95rem}
-select{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
-.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border:0;padding:0;margin:0;min-width:0}
-.sizes legend{padding:0;margin-bottom:8px}
-.sizes input{position:absolute;opacity:0;pointer-events:none}
+.hint{font-weight:400;color:var(--muted);font-size:.85rem}
+select,input[type=text]{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:0;padding:0;margin:0;min-width:0}
+.who input,.sizes input{position:absolute;opacity:0;pointer-events:none}
+.who label{display:flex;align-items:center;justify-content:center;min-height:48px;border:1.5px solid var(--line);border-radius:8px;font-weight:700;cursor:pointer;background:var(--bg);user-select:none}
+.who input:checked+label{background:var(--court);color:var(--court-ink);border-color:var(--court)}
+.sizewrap{border:0;padding:0;margin:0;min-width:0}
+.sizewrap legend,.who legend{padding:0;margin-bottom:8px}
+.sizepick{display:grid;grid-template-columns:minmax(0,1fr) 138px;gap:10px;align-items:center}
+.shirtbox{min-width:0;max-width:230px;margin-inline:auto;width:100%}
+.shirt{display:block;width:100%;height:auto}
+.shirt .body{fill:var(--surface);stroke:var(--line);stroke-width:2;stroke-linejoin:round;transition:stroke .25s}
+.shirt .rib{fill:none;stroke:var(--line);stroke-width:1.2;transition:stroke .25s}
+.shirt.on .body,.shirt.on .rib{stroke:var(--court)}
+.shirt .dims{opacity:.45;transition:opacity .25s}
+.shirt.on .dims{opacity:1}
+.shirt .dim{stroke:var(--court);stroke-width:1.3;fill:none}
+.shirt .ah{fill:var(--court)}
+.shirt text{font-family:var(--font-body);font-size:15px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.shirtcap{margin:4px 0 0;text-align:center;color:var(--muted);font-size:.85rem}
+.shirtextra{margin:2px 0 0;text-align:center;color:var(--warn);font-size:.85rem;font-weight:700}
+.shirtextra:empty{display:none}
+.shirtnote{margin:2px 0 0;text-align:center;color:var(--muted);font-size:.75rem}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.sizepick .sizes label{min-height:0;aspect-ratio:1/1;font-size:1.2rem;border-radius:7px}
 .sizes label{display:flex;align-items:center;justify-content:center;min-height:52px;border:1.5px solid var(--line);border-radius:8px;
   font-family:var(--font-num);font-size:1.5rem;font-weight:700;cursor:pointer;background:var(--bg);user-select:none}
 .sizes input:checked+label{background:var(--court);color:var(--court-ink);border-color:var(--court)}
-.sizes input:focus-visible+label,select:focus-visible,button:focus-visible{outline:3px solid var(--shuttle);outline-offset:2px}
+input:focus-visible+label,select:focus-visible,input[type=text]:focus-visible,button:focus-visible{outline:3px solid var(--shuttle);outline-offset:2px}
+[hidden]{display:none!important}
+.field{display:flex;flex-direction:column;gap:6px}
+.guestbox{display:flex;flex-direction:column;gap:14px}
+.qty{max-width:140px}
 button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:13px 18px;background:var(--court);color:var(--court-ink);cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}
 .msg{min-height:1.5em;font-size:.95rem;margin:0}
@@ -47,10 +71,11 @@ h2{font-size:1.1rem;margin:0}
 .stat .bar i{display:block;height:100%;background:var(--shuttle);width:0;transition:width .4s}
 .stat b{text-align:right}
 .stats{display:flex;flex-direction:column;gap:6px}
+.note{margin:0;color:var(--muted);font-size:.9rem}
 ul.roster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}
 .roster li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);min-width:0}
 .roster .n{overflow-wrap:anywhere}
-.roster .s{font-family:var(--font-num);font-weight:700;font-size:1.2rem;color:var(--ok)}
+.roster .s{font-family:var(--font-num);font-weight:700;font-size:1.2rem;color:var(--ok);white-space:nowrap}
 .roster .s.none{font-family:var(--font-body);font-weight:400;font-size:.9rem;color:var(--warn)}
 @media (max-width:420px){ul.roster{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -59,33 +84,76 @@ ul.roster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:
 <body>
 <div class="wrap">
   <header>
-    <h1>2026 羽球會員<br>衣服尺寸登記</h1>
-    <p>選你的名字、選尺寸、按送出。送出後可以再回來修改。</p>
+    <h1>羽球衣服<br>尺寸登記</h1>
+    <p>會員與非會員都可以登記。送出後可以再回來修改。</p>
   </header>
 
   <div class="court" aria-live="polite">
-    <div class="count"><span id="done">0</span><small> / <span id="total">0</span> 人已填</small></div>
+    <div class="count"><span id="done">0</span><small> / <span id="total">0</span> 位會員已填</small></div>
     <div class="meter"><i id="meter"></i></div>
   </div>
 
-  <form class="card" id="form">
-    <div>
+  <form class="card" id="form" autocomplete="off">
+    <fieldset class="who">
+      <legend class="lbl">你的身分</legend>
+      <input type="radio" name="type" id="t-member" value="member" checked><label for="t-member">我是會員</label>
+      <input type="radio" name="type" id="t-guest" value="guest"><label for="t-guest">我不是會員</label>
+    </fieldset>
+
+    <div class="field" id="memberBox">
       <label class="lbl" for="who">會員姓名</label>
       <select id="who"></select>
     </div>
-    <fieldset class="sizes" id="sizes"><legend class="lbl">衣服尺寸</legend></fieldset>
+
+    <div id="guestBox" class="guestbox" hidden>
+      <div class="field">
+        <label class="lbl" for="gname">姓名</label>
+        <input type="text" id="gname" maxlength="20" placeholder="請輸入你的姓名">
+      </div>
+      <div class="field">
+        <label class="lbl" for="gcontact">聯絡方式 <span class="hint">LINE ID 或手機號碼，主辦人只用來聯絡你</span></label>
+        <input type="text" id="gcontact" maxlength="40" placeholder="例如：LINE ID 或 09xx-xxx-xxx">
+      </div>
+    </div>
+
+    <fieldset class="sizewrap">
+      <legend class="lbl">衣服尺寸</legend>
+      <div class="sizepick">
+        <div class="shirtbox">
+          <svg class="shirt" id="shirt" viewBox="20 8 260 216" role="img" aria-label="T恤尺寸示意圖">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+            </defs>
+            <path class="body" id="sh-body"/>
+            <path class="rib" id="sh-rib"/>
+            <g class="dims">
+              <line class="dim" id="d-chest" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <line class="dim" id="d-len" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <text id="t-chest" text-anchor="middle"></text>
+              <text id="t-len" text-anchor="middle"></text>
+            </g>
+          </svg>
+          <p class="shirtcap" id="shirtcap"></p>
+          <p class="shirtextra" id="shirtextra"></p>
+          <p class="shirtnote">平放測量，誤差約 ±3 公分</p>
+        </div>
+        <div class="sizes" id="sizes"></div>
+      </div>
+    </fieldset>
+
+    <div class="field qty">
+      <label class="lbl" for="qty">件數</label>
+      <select id="qty"></select>
+    </div>
+
     <button type="submit" id="submit" disabled>送出</button>
     <p class="msg" id="msg" role="status"></p>
   </form>
 
   <section class="card">
-    <h2>尺寸統計</h2>
+    <h2>尺寸統計（會員＋非會員）</h2>
     <div class="stats" id="stats"></div>
-  </section>
-
-  <section class="card">
-    <h2>填寫狀況</h2>
-    <ul class="roster" id="roster"></ul>
+    <p class="note" id="guestNote"></p>
   </section>
 </div>
 
@@ -94,100 +162,189 @@ ul.roster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:
 var API_URL = "https://script.google.com/macros/s/AKfycbxEoOvHgoGpGYkb4_BhB0_qqZg8eWiq7bp2q56a8CEr285keM6lA0a_TsuHrLL-FbmV/exec";
 
 var MEMBERS=["劉道一","劉玫芳","賴宛詩","殷宏源","楊曉雯","謝育均","賴秀鳳","林易騰","簡廷澔","彭晨軒","黃偉政","李榮淑","陳文娟","陳培基","吳光榮","素娟","黃足寧","王耀毅","蕭靜純","許家莉","陳俊賢","黃晧維","邱聖凱","劉淑娟","亭妤","HELEN","齊老"];
-var SIZES=["XS","S","M","L","XL","2XL","3XL","4XL"];
+var SIZES=["XS","S","M","L","XL","2XL","3XL","4XL","5XL"];
+// 廠商「全彩T恤尺寸表」，單位：公分，平放測量，誤差約 ±3 公分。c 衣寬、l 衣長
+var CHART={XS:{c:47,l:60},S:{c:50,l:62},M:{c:52,l:65},L:{c:54,l:67},XL:{c:57,l:70},
+           "2XL":{c:60,l:73},"3XL":{c:62,l:75},"4XL":{c:65,l:77},"5XL":{c:67,l:80}};
+var EXTRA={"5XL":"單件加收 100 元"};
+var QTY_MAX=10;
 
 (function(){
-  var data={};            // 姓名 -> 尺寸
+  var members={};   // 姓名 -> {size,qty}
+  var totals={}, guestPeople=0;
   var busy=false, ready=false;
   var $=function(id){return document.getElementById(id)};
 
   $("total").textContent=MEMBERS.length;
+
   var sizesEl=$("sizes");
   SIZES.forEach(function(s){
     var i=document.createElement("input");i.type="radio";i.name="size";i.id="sz-"+s;i.value=s;
     var l=document.createElement("label");l.htmlFor=i.id;l.textContent=s;
     sizesEl.appendChild(i);sizesEl.appendChild(l);
   });
-  sizesEl.addEventListener("change",refreshButton);
+  var qtyEl=$("qty");
+  for(var q=1;q<=QTY_MAX;q++){var o=document.createElement("option");o.value=o.textContent=q;qtyEl.appendChild(o)}
 
   var who=$("who");
+  function type(){return document.querySelector('input[name="type"]:checked').value}
+  function selectedSize(){var c=document.querySelector('input[name="size"]:checked');return c?c.value:""}
+
   function buildSelect(){
     var keep=who.value;
     who.innerHTML="";
     var ph=document.createElement("option");ph.value="";ph.textContent="請選擇你的名字";who.appendChild(ph);
     MEMBERS.forEach(function(n,i){
       var o=document.createElement("option");o.value=String(i);
-      o.textContent=n+(data[n]?"　✓ "+data[n]:"");
+      var d=members[n];
+      o.textContent=n+(d?"　✓ "+d.size+" × "+d.qty:"");
       who.appendChild(o);
     });
     who.value=keep;
   }
+
+  function applyType(){
+    var g=type()==="guest";
+    $("memberBox").hidden=g;
+    $("guestBox").hidden=!g;
+    $("msg").textContent="";$("msg").className="msg";
+    refreshButton();
+  }
+  document.querySelectorAll('input[name="type"]').forEach(function(r){r.addEventListener("change",applyType)});
+
   who.addEventListener("change",function(){
-    var d=data[MEMBERS[+who.value]];
-    SIZES.forEach(function(s){$("sz-"+s).checked=(d===s)});
+    var d=members[MEMBERS[+who.value]];
+    SIZES.forEach(function(s){$("sz-"+s).checked=!!d&&d.size===s});
+    qtyEl.value=d?String(d.qty):"1";
     $("msg").textContent="";$("msg").className="msg";
     refreshButton();
   });
-  function selectedSize(){var c=document.querySelector('input[name="size"]:checked');return c?c.value:""}
+  ["gname","gcontact"].forEach(function(id){$(id).addEventListener("input",refreshButton)});
+  sizesEl.addEventListener("change",refreshButton);
+
+  // ---- T恤示意圖：形狀與標示會跟著選到的尺寸變化 ----
+  var K=2.3,CX=150,Y0=30,ANG=32*Math.PI/180;
+  var cur={c:52,l:65},shown=null,raf=0;
+  function P(x,y){return x.toFixed(1)+","+y.toFixed(1)}
+  function setA(id,o){var el=$(id);for(var k in o)el.setAttribute(k,o[k].toFixed?o[k].toFixed(1):o[k])}
+  function draw(v){
+    var half=v.c*K/2,len=v.l*K,sl=v.c*0.36*K,ad=56,cw=40; // 袖長僅供繪圖，不標示
+    var dx=-Math.cos(ANG),dy=Math.sin(ANG),nx=Math.sin(ANG),ny=Math.cos(ANG);
+    var SLx=CX-half+3,SLy=Y0+10;
+    var Ex=SLx+sl*dx,Ey=SLy+sl*dy,E2x=Ex+cw*nx,E2y=Ey+cw*ny;
+    var Ax=CX-half,Ay=Y0+ad,Hy=Y0+len;
+    function m(x){return 2*CX-x}
+    $("sh-body").setAttribute("d",
+      "M"+P(CX-18,Y0)+" L"+P(SLx,SLy)+" L"+P(Ex,Ey)+" L"+P(E2x,E2y)+" L"+P(Ax,Ay)+
+      " L"+P(Ax,Hy)+" L"+P(m(Ax),Hy)+" L"+P(m(Ax),Ay)+" L"+P(m(E2x),E2y)+" L"+P(m(Ex),Ey)+
+      " L"+P(m(SLx),SLy)+" L"+P(CX+18,Y0)+" Q"+P(CX,Y0+18)+" "+P(CX-18,Y0)+"Z");
+    $("sh-rib").setAttribute("d",
+      "M"+P(CX-15,Y0+1)+" Q"+P(CX,Y0+13)+" "+P(CX+15,Y0+1)+
+      " M"+P(Ax,Hy-8)+" L"+P(m(Ax),Hy-8));
+    // 胸寬
+    var yc=Ay+8;
+    setA("d-chest",{x1:Ax+1.5,y1:yc,x2:m(Ax)-1.5,y2:yc});
+    setA("t-chest",{x:CX-half*0.22,y:yc-7});
+    // 衣長
+    var xl=CX+half*0.55,y1=Y0+10*(xl-CX-18)/(m(SLx)-CX-18)+1;
+    setA("d-len",{x1:xl,y1:y1,x2:xl,y2:Hy-1});
+    var ty=(y1+Hy)/2+16,tx=xl+13;
+    setA("t-len",{x:tx,y:ty,transform:"rotate(-90 "+tx.toFixed(1)+" "+ty.toFixed(1)+")"});
+  }
+  function updateShirt(sel){
+    var key=CHART[sel]?sel:"";
+    if(key===shown)return;
+    shown=key;
+    var v=CHART[key||"M"];
+    $("shirt").classList.toggle("on",!!key);
+    $("t-chest").textContent="衣寬 "+(key?v.c:"—");
+    $("t-len").textContent="衣長 "+(key?v.l:"—");
+    $("shirtcap").textContent=key?key+" 號（單位：公分）":"點右邊的尺寸，看實際尺寸";
+    $("shirtextra").textContent=EXTRA[key]?key+" "+EXTRA[key]:"";
+    cancelAnimationFrame(raf);
+    var from={c:cur.c,l:cur.l},t0=null,dur=260;
+    if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches){cur={c:v.c,l:v.l};draw(cur);return}
+    (function step(t){
+      if(t0===null)t0=t;
+      var p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+      cur={c:from.c+(v.c-from.c)*e,l:from.l+(v.l-from.l)*e};
+      draw(cur);
+      if(p<1)raf=requestAnimationFrame(step);
+    })(performance.now());
+  }
+
   function refreshButton(){
-    var b=$("submit");
-    b.disabled=!ready||busy||who.value===""||selectedSize()==="";
-    b.textContent=(who.value!==""&&data[MEMBERS[+who.value]])?"更新尺寸":"送出";
+    updateShirt(selectedSize());
+    var b=$("submit"),ok;
+    if(type()==="member"){
+      ok=who.value!=="";
+      b.textContent=(ok&&members[MEMBERS[+who.value]])?"更新尺寸":"送出";
+    }else{
+      ok=$("gname").value.trim()!==""&&$("gcontact").value.trim()!=="";
+      b.textContent="送出";
+    }
+    b.disabled=!ready||busy||!ok||selectedSize()==="";
   }
 
   function render(){
-    var counts={};SIZES.forEach(function(s){counts[s]=0});
     var done=0;
-    MEMBERS.forEach(function(n){var s=data[n];if(s&&counts[s]!==undefined){counts[s]++;done++}});
+    MEMBERS.forEach(function(n){if(members[n])done++});
     $("done").textContent=done;
     $("meter").style.width=(MEMBERS.length?done/MEMBERS.length*100:0)+"%";
-    var max=Math.max.apply(null,SIZES.map(function(s){return counts[s]}).concat([1]));
+    var max=Math.max.apply(null,SIZES.map(function(s){return totals[s]||0}).concat([1]));
+    var sum=0;
     $("stats").innerHTML=SIZES.map(function(s){
-      return '<div class="stat"><span>'+s+'</span><span class="bar"><i style="width:'+(counts[s]/max*100)+'%"></i></span><b>'+counts[s]+'</b></div>';
+      var n=totals[s]||0;sum+=n;
+      return '<div class="stat"><span>'+s+'</span><span class="bar"><i style="width:'+(n/max*100)+'%"></i></span><b>'+n+'</b></div>';
     }).join("");
-    var ul=$("roster");ul.innerHTML="";
-    MEMBERS.forEach(function(n){
-      var s=data[n];
-      var li=document.createElement("li");
-      var a=document.createElement("span");a.className="n";a.textContent=n;
-      var b=document.createElement("span");b.className="s"+(s?"":" none");b.textContent=s||"未填";
-      li.appendChild(a);li.appendChild(b);ul.appendChild(li);
-    });
+    $("guestNote").textContent="目前共 "+sum+" 件，其中非會員 "+guestPeople+" 人已登記。";
     buildSelect();refreshButton();
   }
 
   function call(params){
-    var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k])}).join("&");
-    return fetch(API_URL+"?"+q).then(function(r){return r.json()});
+    var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k])}).join("&");
+    return fetch(API_URL+"?"+qs).then(function(r){return r.json()});
   }
   function load(){
     return call({action:"list"}).then(function(res){
       var next={};
-      (res.data||[]).forEach(function(r){if(r.name&&r.size)next[r.name]=r.size});
-      data=next;ready=true;render();
+      (res.members||[]).forEach(function(r){next[r.name]={size:r.size,qty:r.qty||1}});
+      members=next;totals=res.totals||{};guestPeople=res.guestPeople||0;
+      ready=true;render();
     });
   }
 
   $("form").addEventListener("submit",function(e){
     e.preventDefault();
     if(!ready||busy)return;
-    var name=MEMBERS[+who.value],size=selectedSize();
-    if(!name||!size)return;
+    var size=selectedSize(),qty=qtyEl.value,params,who_;
+    if(!size)return;
+    if(type()==="member"){
+      if(who.value==="")return;
+      who_=MEMBERS[+who.value];
+      params={action:"submit",type:"member",name:who_,size:size,qty:qty};
+    }else{
+      who_=$("gname").value.trim();
+      var c=$("gcontact").value.trim();
+      if(!who_||!c)return;
+      params={action:"submit",type:"guest",name:who_,contact:c,size:size,qty:qty};
+    }
     busy=true;refreshButton();
     var msg=$("msg");msg.className="msg";msg.textContent="送出中…";
-    call({action:"submit",name:name,size:size}).then(function(res){
+    call(params).then(function(res){
       if(!res.ok)throw new Error(res.error||"failed");
-      msg.className="msg ok";msg.textContent=name+" 的尺寸 "+size+" 已記錄。";
+      msg.className="msg ok";msg.textContent=who_+" 的 "+size+" × "+qty+" 已記錄。";
       return load();
-    }).catch(function(){
-      msg.className="msg err";msg.textContent="送出失敗，請稍後再試一次。";
+    }).catch(function(err){
+      msg.className="msg err";
+      msg.textContent=(err&&err.message==="full")?"非會員登記名額已滿，請聯絡主辦人。":"送出失敗，請確認欄位後再試一次。";
     }).then(function(){busy=false;refreshButton()});
   });
 
   render();
   if(!API_URL){
     $("msg").className="msg err";
-    $("msg").textContent="尚未設定資料連結。請主辦人依說明把 Google Apps Script 網址貼到 index.html 的 API_URL。";
+    $("msg").textContent="尚未設定資料連結。請主辦人把 Google Apps Script 網址貼到 index.html 的 API_URL。";
     return;
   }
   $("msg").textContent="讀取名單中…";
