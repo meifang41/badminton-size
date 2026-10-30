@@ -21,6 +21,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body)
 .wrap{max-width:640px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
 header h1{font-size:1.7rem;line-height:1.25;margin:0 0 4px;font-weight:700}
 header p{margin:0;color:var(--muted);text-wrap:pretty}
+.hline{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:12px}
+.tag{font-size:1rem;font-weight:700;white-space:nowrap}
+.tag.price{color:var(--court);font-family:var(--font-num);font-size:1.5rem}
+.tag.due{color:var(--warn)}
 .design{margin:0;display:flex;flex-direction:column;gap:8px}
 .designbtn{padding:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;cursor:zoom-in;display:block;line-height:0}
 .designbtn img{width:100%;height:auto;display:block}
@@ -86,7 +90,10 @@ ul.roster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:
 <body>
 <div class="wrap">
   <header>
-    <h1>羽球衣服<br>尺寸登記</h1>
+    <h1>
+      <span class="hline">羽球衣服<small class="tag price">一件 $490</small></span>
+      <span class="hline">尺寸登記<small class="tag due">截止日為 2026/11/06</small></span>
+    </h1>
     <p>會員與非會員都可以登記，送出後可以再回來修改（非會員需要輸入和前次訂購相同的名字及電話）。</p>
   </header>
 
